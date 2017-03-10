@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.js"></script>
+	<style>
+	.bars:hover {
+		fill: black;
+	}
+	</style>
+</head>
+<body>
+	<svg width="960" height="500"></svg>
+	<script>
+	//define margins, height, width
+	let svg = d3.select("svg"),
+		margin = {top: 50, right: 40, bottom: 40, left: 50},
+		width = svg.attr("width") - margin.left - margin.right,
+		height = svg.attr("height") - margin.top - margin.bottom,
+		g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	//define scales
+	let x0 = d3.scaleBand().rangeRound([0, width]).paddingInner(0.1),
+		x1 = d3.scaleBand().padding(0.05),
+		y = d3.scaleLinear().rangeRound([height, 0]),
+		z = d3.scaleOrdinal().range(["#df65b0", "#dd1c77", "#980043"]);
+
+	//load data
+	d3.csv("data.csv", type, function(error, data) {
+		if(error) throw error;
+
+		//place data columns in keys variable
+		let keys = data.columns.slice(1);
+
+		x0.domain(data.map(function(d) { return d.country; }));
+		x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+		y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]);
+	
+		//append rects to svg
+		g.append("g")
+			.selectAll("g")
+			.data(data)
+			.enter()
+			.append("g")
+			.attr("transform", function(d) { return "translate(" + x0(d.country) + ",0)"; })
+			.selectAll("rect")
+			.data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+			.enter()
+			.append("rect")
+			.attr("class", "bars")
+			.attr("x", function(d) { return x1(d.key); })
+			.attr("y", function(d) { return y(d.value); })
+			.attr("width", x1.bandwidth())
+			.attr("height", function(d) { return height - y(d.value) ;})
+			.attr("fill", function(d) { return z(d.key); })
+			.style("opacity", ".8");
+
+		//append x axis to svg 
+		g.append("g")
+			.attr("class", "x-axis")
+			.attr("transform", "translate(0," + height + ")")
+			.attr("stroke-width", 1)
+			.call(d3.axisBottom(x0));
+
+		//append y axis to svg 
+		g.append("g")
+			.attr("class", "y-axis")
+			.style("stroke-width", 1)
+			.call(d3.axisLeft(y))
+			.append("text")
+			.attr("x", -200)
+			.attr("y", -40)
+			.attr("dy", "0.32em")
+			.attr("fill", "#000")
+			.attr("transform", "rotate(-90)")
+			.text("% of GDP");
+	});
+
+	//bind multiseries data
+	function type(d, _, columns) {
+		//iterate through each column
+		for(var i = 1, n = columns.length, c; i < n; ++i)
+			//bind column to the country
+			d[c = columns[i]] = +d[c];
+			return d;
+	}
+
+	//define chart title
+	let title = svg.append("g")
+		.attr("class", "title");
+	title.append("text")
+		.attr("x", (width/1.75))
+			.attr("y", 30)
+			.attr("text-anchor", "middle")
+			.style("font", "20px sans-serif")
+			.text("Percent of GDP Spent on Health, 2011-2013");
+
+	//define source data
+	let source = svg.append("g")
+		.attr("class", "source");
+	source.append("text")
+		.attr("x", 10)
+		.attr("y", 500)
+		.attr("text-anchor", "left")
+		.style("font", "12px monospace")
+		.text("Source: Organization for Economic Cooperation and Development (OECD)");
+	</script>
+</body>
+</html>

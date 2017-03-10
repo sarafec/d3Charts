@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.js"></script>
+	<style>
+		body {
+			display: inline-block;
+			float: left;
+		}
+		.menu{
+			font-size: 12px;
+			outline: none;
+			border: none;
+			width: 150px;
+			display: inline;
+			float: right;
+			margin-top: 90px;
+		}
+
+		#instructions {
+			opacity: .5;
+			font-size: 20px;
+			color: lightgrey;
+			font-family: sans-serif;
+		}
+
+		#inactive {
+			display: none;
+		}
+
+	</style>
+</head>
+<body>
+	<svg width="800" height="500" id="chart">
+	</svg>
+	<select size="25" class="menu">
+		<option id="national-average">National Average</option>
+		<option id="alabama">Alabama</option>
+		<option id="alaska">Alaska</option>
+		<option id="arizona">Arizona</option>
+		<option id="arkansas">Arkansas</option>
+		<option id="california">California</option>
+		<option id="colorado">Colorado</option>
+		<option id="connecticut">Connecticut</option>
+		<option id="dc">Washington D.C.</option>
+		<option id="delaware">Delaware</option>
+		<option id="florida">Florida</option>
+		<option id="georgia">Georgia</option>
+		<option id="hawaii">Hawaii</option>
+		<option id="idaho">Idaho</option>
+		<option id="illinois">Illinois</option>
+		<option id="indiana">Indiana</option>
+		<option id="iowa">Iowa</option>
+		<option id="kansas">Kansas</option>
+		<option id="kentucky">Kentucky</option>
+		<option id="louisiana">Louisiana</option>
+		<option id="maine">Maine</option>
+		<option id="maryland">Maryland</option>
+		<option id="massachusetts">Massachusetts</option>
+		<option id="michigan">Michigan</option>
+		<option id="minnesota">Minnesota</option>
+		<option id="mississippi">Mississippi</option>
+		<option id="missouri">Missouri</option>
+		<option id="montana">Montana</option>
+		<option id="nebraska">Nebraska</option>
+		<option id="nevada">Nevada</option>
+		<option id="new-hampshire">New Hampshire</option>
+		<option id="new-jersey">New Jersey</option>
+		<option id="new-mexico">New Mexico</option>
+		<option id="new-york">New York</option>
+		<option id="north-carolina">North Carolina</option>
+		<option id="north-dakota">North Dakota</option>
+		<option id="ohio">Ohio</option>
+		<option id="oklahoma">Oklahoma</option>
+		<option id="oregon">Oregon</option>
+		<option id="pennsylvania">Pennsylvania</option>
+		<option id="rhode-island">Rhode Island</option>
+		<option id="south-carolina">South Carolina</option>
+		<option id="south-dakota">South Dakota</option>
+		<option id="tennessee">Tennessee</option>
+		<option id="texas">Texas</option>
+		<option id="utah">Utah</option>
+		<option id="vermont">Vermont</option>
+		<option id="virginia">Virginia</option>
+		<option id="washington">Washington</option>
+		<option id="west-virginia">West Virginia</option>
+		<option id="wisconsin">Wisconsin</option>
+		<option id="wyoming">Wyoming</option>
+	</select>
+
+	<script>
+	//define chart margins
+	var svg = d3.select("svg"),
+		margin = {top: 80, right: 80, bottom: 40, left: 60},
+		width = svg.attr("width") - margin.left - margin.right,
+		height = svg.attr("height") - margin.top - margin.bottom;
+
+	//define time format
+	let parseYear = d3.timeParse("%Y");
+
+	//define scales
+	let x = d3.scaleTime().range([0, width]),
+		y = d3.scaleLinear().range([height, 0]);
+
+	//define line generator
+	let line = d3.line()
+		.curve(d3.curveBasis)
+		.x(function(d) { return x(d.year); })
+		.y(function(d) { return y(d.state); });
+
+
+	//load data based on click element's id value
+	let clickState = document.querySelector("select").addEventListener("click", function(e) {
+
+		//hide previous chart
+		d3.select("#active").attr("id", "inactive");
+		//hide instructions
+		d3.select("#instructions").style("display", "none");
+
+		//load data based on click element's id value
+		d3.csv("/data/" + e.target.id + ".csv", function(d) {
+			d.year = parseYear(d.year)
+			d.state = +d.state;
+			return d;
+		}, function(error, data) {
+			if(error) throw error;
+
+		//define x axis
+		x.domain(d3.extent(data, function(d) { return d.year; }));
+
+		//define y axis
+		y.domain(d3.extent(data, function(d) { return d.state; }));
+
+		//append svg area
+		g = svg.append("g").attr("transform", "translate(" + margin.left + "," +margin.top + ")").attr("id", "active");
+
+		//append x axis
+		g.append("g")
+			.attr("class", "axis axis-x")
+			.attr("transform", "translate(0," + height + ")")
+			.style("stroke-width", 1.5)
+			.call(d3.axisBottom(x));
+
+		//append y axis
+		g.append("g")
+			.attr("class", "axis axis-y")
+			.style("stroke-width", 1.5)
+			.call(d3.axisLeft(y))
+			.append("text")
+			.attr("transform", "rotate(-90)")
+			.attr("y", -60)
+			.attr("x", -150)
+			.attr("dy", "0.9em")
+			.attr("fill", "#000")
+			.text("Number of Births");
+
+		//append path to svg
+		g.append("path")
+			.datum(data)
+			.attr("stroke", "#bd0026")
+			.attr("fill", "none")
+			.attr("stroke-width", 2)
+			.attr("class", "line")
+			.attr("d", line);
+
+		});
+	});
+
+	//define instruction text
+	let instructions = svg.append("g")
+		.attr("id", "instructions");
+	instructions.append("text")
+		.attr("x", width/2)
+		.attr("y", height/1.75)
+		.attr("text-anchor", "middle")
+		.text("Click State to View Chart");
+
+	//define chart title
+	let title = svg.append("g")
+		.attr("class", "title");
+	title.append("text")
+		.attr("x", (width/2))
+			.attr("y", 60)
+			.attr("text-anchor", "middle")
+			.style("font", "20px sans-serif")
+			.text("Teen Births in the United States, 1990-2012");
+
+	//source data
+	let source = svg.append("g")
+		.attr("class", "source");
+	source.append("text")
+		.attr("x", 0)
+		.attr("y", 500)
+		.attr("text-anchor", "left")
+		.style("font", "12px monospace")
+		.text("Source: Centers for Disease Control and Prevention (CDC)")
+
+
+	</script>
+</body>
+</html>
