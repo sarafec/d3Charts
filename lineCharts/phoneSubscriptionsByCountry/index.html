@@ -125,24 +125,6 @@
 			return d;
 	}
 
-	//define vertical line - start of arab spring
-	let arabSpring = svg.append("g")
-		.attr("class", "arabSpring");
-	arabSpring.append("line")
-		.attr("x1", "610px")
-		.attr("y1", 50)
-		.attr("x2", "610px")
-		.attr("y2", 500 - margin.bottom)
-		.style("stroke-width", "1px")
-		.style("stroke", "black")
-		.style("opacity", "0.4")
-		.style("fill", "none");
-	arabSpring.append("text")
-		.attr("x", 615)
-		.attr("y", 60)
-		.style("font", "10px sans-serif")
-		.text("Arab Spring Began");
-
 	//define chart title
 	let title = svg.append("g")
 		.attr("class", "title");
