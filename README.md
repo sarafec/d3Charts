@@ -6,7 +6,8 @@ Click on the chart title to view a bl.ocks.org hosted version of the chart.
 ### [Teen Births in the United States](https://bl.ocks.org/sarafec/8a49f3680f44b84d5a983c580791155e)
 This series of line charts shows the decrease in births by teen mothers (aged 15-19)in the United States from 1990-2012.
 Data for this chart came from the [Centers for Disease Control and Prevention](https://www.healthdata.gov/dataset/nchs-us-and-state-trends-teen-births-1990%C3%A2%C2%80%C2%932014).    
-Futher information (and annecdotes) can be found in this [blog post](https://medium.com/@sarafecadu/reflections-on-52-line-charts-with-d3-js-ee9d69d4bdad#.ebmma8rne).
+Futher information (and annecdotes) can be found in this [blog post](https://medium.com/@sarafecadu/reflections-on-52-line-charts-with-d3-js-ee9d69d4bdad#.ebmma8rne).  
+Update(7/14/17): This chart has been updated. The new multiseries version with region filtering is avialable [here](https://bl.ocks.org/sarafec/287bc9628a723d70285178ff9b2a718a).
 
 ### [North African Mobile Phone Subscriptions](https://bl.ocks.org/sarafec/5a4fb3274c1e50d52d91d8b9465c7320)
 This simple multiseries line chart visualizes the increase in North African mobile phone subscriptions, 1995-2014.
